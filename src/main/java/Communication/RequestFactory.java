@@ -1,6 +1,6 @@
 package Communication;
 
-import Utils.CommandTypes;
+import Utils.Enums.CommandTypes;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -33,21 +33,21 @@ public class RequestFactory{
         return buildRequest(command);
     }
 
-    public Request getRequest(CommandTypes action, String parameter) {
+    public Request getRequest(CommandTypes action, Enum parameter) {
         String command = "{'Command':'" + action + "',"
                 + "'Login':'" + login + "',"
                 + "'Token':'" + token + "',"
-                + "'Parameter':'" + parameter + "',"
+                + "'Parameter':'" + parameter.toString() + "',"
                 + "}";
 
         return buildRequest(command);
     }
 
-    public Request getRequest(CommandTypes action, String parameter, int value) {
+    public Request getRequest(CommandTypes action, Enum parameter, int value) {
         String command = "{'Command':'" + action + "',"
                 + "'Login':'" + login + "',"
                 + "'Token':'" + token + "',"
-                + "'Parameter':'" + parameter + "',"
+                + "'Parameter':'" + parameter.toString() + "',"
                 + "'Value':'" + value + "',"
                 + "}";
 
