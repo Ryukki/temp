@@ -27,7 +27,7 @@ public class RequestFactory{
     public Request getRequest(CommandTypes action) {
         String command = "{'Command':'" + action + "',"
                 + "'Login':'" + login + "',"
-                + "'Token':'" + token + "',"
+                + "'Token':'" + token + "'"
                 + "}";
 
         return buildRequest(command);
@@ -37,7 +37,7 @@ public class RequestFactory{
         String command = "{'Command':'" + action + "',"
                 + "'Login':'" + login + "',"
                 + "'Token':'" + token + "',"
-                + "'Parameter':'" + parameter.toString() + "',"
+                + "'Parameter':'" + parameter.toString() + "'"
                 + "}";
 
         return buildRequest(command);
@@ -48,7 +48,7 @@ public class RequestFactory{
                 + "'Login':'" + login + "',"
                 + "'Token':'" + token + "',"
                 + "'Parameter':'" + parameter.toString() + "',"
-                + "'Value':'" + value + "',"
+                + "'Value':'" + value + "'"
                 + "}";
 
         return buildRequest(command);
@@ -59,8 +59,18 @@ public class RequestFactory{
         RequestBody body = RequestBody.create(mediaType, command);
 
         Request request = new Request.Builder()
-                .url(url)
+                .url(url+"execute")
                 .post(body)
+                .addHeader("content-type", "application/json")
+                .addHeader("cache-control", "no-cache")
+                .build();
+
+        return request;
+    }
+
+    public Request getStatusRequest(){
+        Request request = new Request.Builder()
+                .url(url+"describe?login=" + login + "&token=" + token)
                 .addHeader("content-type", "application/json")
                 .addHeader("cache-control", "no-cache")
                 .build();
