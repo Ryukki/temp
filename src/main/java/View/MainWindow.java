@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by Ryukki on 23.03.2018.
@@ -28,15 +29,18 @@ public class MainWindow {
     private JRadioButton chaarrOrSimulationRadioButton;
     private JTextField turnTextField;
     private JTextField locationTextField;
-    private JTextField textField3;
-    private JTextField textField4;
-    private JTextField textField5;
-    private JTextField textField;
-    private JTextField textField7;
-    private JTextField textField8;
     private JPanel mainPanel;
+    private JTextArea eventsTextArea;
+    private JTextArea lastTurnEventsTextArea;
+    private JTextArea equipmentsTextArea;
+    private JTextArea logBookTextArea;
+    private JTextArea scoresTextArea;
+    private JTextArea parametersTextArea;
 
+    //nie zapomnieć logować jaka komenda z jakimi parametrami
     public MainWindow() {
+        setupListeners();
+        setupTextFields();
         OkHttpClient client = new OkHttpClient();
 
         RequestFactory requestFactory = new RequestFactory(false);
@@ -54,7 +58,34 @@ public class MainWindow {
         try {
             String jsonData = response.body().string();
             JSONObject jsonObject = new JSONObject(jsonData);
+            logTextArea.append(jsonObject.toString(4));
             JsonFormatter jsonFormatter = new JsonFormatter(jsonObject);
+            turnTextField.setText("Turn: " + jsonFormatter.getTurn());
+            locationTextField.setText("Location: " + jsonFormatter.getLocation());
+            eventsTextArea.setText("Events:");
+            for (String event: jsonFormatter.getEvents()) {
+                eventsTextArea.append("\n" + event);
+            }
+            lastTurnEventsTextArea.setText("Last Turn Events:");
+            for (String lastTurnEvent: jsonFormatter.getLastTurnEvents()) {
+                lastTurnEventsTextArea.append("\n" + lastTurnEvent);
+            }
+            equipmentsTextArea.setText("Equipments:");
+            for (String equipment: jsonFormatter.getEquipments()) {
+                equipmentsTextArea.append("\n" + equipment);
+            }
+            logBookTextArea.setText("Log Book:");
+            for (String log: jsonFormatter.getLogBook()) {
+                logBookTextArea.append("\n" + log);
+            }
+            scoresTextArea.setText("Scores:");
+            for (Map.Entry<String, Integer> score:jsonFormatter.getScores().entrySet()) {
+                scoresTextArea.append("\n" + score.getKey() + ": " + score.getValue());
+            }
+            parametersTextArea.setText("Parameters:");
+            for (Map.Entry<String, Integer> parameter:jsonFormatter.getParameters().entrySet()) {
+                parametersTextArea.append("\n" + parameter.getKey() + ": " + parameter.getValue());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,6 +107,21 @@ public class MainWindow {
 
             }
         });
+    }
+
+    private void setupTextFields(){
+        logTextArea.setEditable(false);
+        logTextArea.setLineWrap(true);
+        //logTextArea.setVisible(false);
+        turnTextField.setEditable(false);
+        locationTextField.setEditable(false);
+        eventsTextArea.setEditable(false);
+        lastTurnEventsTextArea.setEditable(false);
+        equipmentsTextArea.setEditable(false);
+        logBookTextArea.setEditable(false);
+        logBookTextArea.setLineWrap(true);
+        scoresTextArea.setEditable(false);
+        parametersTextArea.setEditable(false);
     }
 
     public JPanel getMainPanel() {
