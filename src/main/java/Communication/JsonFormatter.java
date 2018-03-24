@@ -12,7 +12,6 @@ import java.util.Map;
  * Created by Ryukki on 23.03.2018.
  */
 public class JsonFormatter {
-    //metody którym przekazujemy jsona/stringa i zwracają konkretne wartości pola
     private JSONObject jsonObject;
 
     public JsonFormatter(JSONObject objectToFormat){

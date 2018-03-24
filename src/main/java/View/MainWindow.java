@@ -1,5 +1,6 @@
 package View;
 
+import Communication.JsonFormatter;
 import Communication.RequestFactory;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -52,7 +53,8 @@ public class MainWindow {
     private void displayResponse(Response response){
         try {
             String jsonData = response.body().string();
-            JSONObject Jobject = new JSONObject(jsonData);
+            JSONObject jsonObject = new JSONObject(jsonData);
+            JsonFormatter jsonFormatter = new JsonFormatter(jsonObject);
         } catch (IOException e) {
             e.printStackTrace();
         }
