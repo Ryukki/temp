@@ -2,6 +2,8 @@ package View;
 
 import Communication.JsonFormatter;
 import Communication.RequestFactory;
+import Communication.RequestSender;
+import Utils.Enums.CommandTypes;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -37,18 +39,16 @@ public class MainWindow {
     private JTextArea scoresTextArea;
     private JTextArea parametersTextArea;
 
+    private RequestSender requestSender;
+
     //nie zapomnieć logować jaka komenda z jakimi parametrami
     public MainWindow() {
         setupListeners();
         setupTextFields();
-        OkHttpClient client = new OkHttpClient();
 
-        RequestFactory requestFactory = new RequestFactory(false);
-        Request request = requestFactory.getStatusRequest();
-
+        requestSender = new RequestSender(chaarrOrSimulationRadioButton.isSelected());
         try {
-            Response response = client.newCall(request).execute();
-            displayResponse(response);
+            displayResponse(requestSender.getStatus());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -122,6 +122,7 @@ public class MainWindow {
         logBookTextArea.setLineWrap(true);
         scoresTextArea.setEditable(false);
         parametersTextArea.setEditable(false);
+        commandComboBox.setModel(new DefaultComboBoxModel(CommandTypes.values()));
     }
 
     public JPanel getMainPanel() {
