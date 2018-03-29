@@ -1,4 +1,4 @@
-package Communication;
+package Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -71,5 +71,26 @@ public class JsonFormatter {
 
     public Map<String, Integer> getParameters(){
         return getMap("parameters");
+    }
+
+    public String getEntireResponse(){
+        return jsonObject.toString(4);
+    }
+
+    public String getResponseForLogging(){
+        JSONObject tempJsonObject = new JSONObject(jsonObject.toString());
+        tempJsonObject.remove("events");
+        tempJsonObject.remove("logBook");
+        String responseString = tempJsonObject.toString(4);
+        responseString = responseString.replaceAll("\n", "\r\n");
+        return responseString;
+    }
+
+    public Boolean checkTerminated(){
+        String isTerminated = getSingleValue("isTerminated");
+        if (isTerminated.equals("false")){
+            return false;
+        }
+        return true;
     }
 }

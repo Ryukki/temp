@@ -19,5 +19,4 @@ public class Main {
         //mainFrame.setResizable(false);
         mainFrame.setVisible(true);
     }
-
 }

@@ -10,5 +10,6 @@ public enum CommandTypes {
     Harvest,
     Repair,
     Order,
-    Restart
+    Restart,
+    RestartSimulation
 }
