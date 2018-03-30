@@ -42,6 +42,16 @@ public class MainWindow {
     private JScrollPane logAreaScrollPane;
     private JScrollPane eventsScrollPane;
     private JButton undoButton;
+    private JTextField textField1;
+    private JTextField textField2;
+    private JTextField textField3;
+    private JTextField textField4;
+    private JTextField textField5;
+    private JTextField textField6;
+    private JTextField textField7;
+    private JTextField textField8;
+    private JTextField textField9;
+    private JTextField textField10;
 
     private RequestSender requestSender;
     private StatusDisplayer statusDisplayer;
@@ -161,6 +171,7 @@ public class MainWindow {
                 String commandLog = sendRequest();
                 if (!commandLog.equals("")){
                     logTextArea.append(commandLog);
+                    showStatus();
                     try {
                         logger.log(paragraph + commandLog + paragraph);
                     } catch (IOException e1) {
@@ -235,21 +246,17 @@ public class MainWindow {
             case Scan:
             case MoveTo:
             case Harvest:
-                //parameterComboBox.setEditable(true);
                 parameterComboBox.setModel(new DefaultComboBoxModel(Locations.values()));
                 valueTextField.setEditable(false);
                 break;
             case Produce:
-                //parameterComboBox.setEditable(true);
                 parameterComboBox.setModel(new DefaultComboBoxModel(ProducedGoods.values()));
                 break;
             case Repair:
-                //parameterComboBox.setEditable(true);
                 parameterComboBox.setModel(new DefaultComboBoxModel(RepairableStuff.values()));
                 valueTextField.setEditable(false);
                 break;
             case Order:
-               // parameterComboBox.setEditable(true);
                 parameterComboBox.setModel(new DefaultComboBoxModel(Orders.values()));
                 valueComboBox.setVisible(true);
                 valueComboBox.setModel(new DefaultComboBoxModel(Locations.values()));
