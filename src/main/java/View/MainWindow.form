@@ -282,7 +282,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="f310" class="javax.swing.JLabel" binding="ParameterLabel">
+              <component id="f310" class="javax.swing.JLabel" binding="parameterLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
                     <preferred-size width="78" height="16"/>
@@ -320,7 +320,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="2de07" class="javax.swing.JLabel" binding="ValueLabel">
+              <component id="2de07" class="javax.swing.JLabel" binding="valueLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
                     <preferred-size width="78" height="16"/>
@@ -380,7 +380,7 @@
                   <text value="Undo"/>
                 </properties>
               </component>
-              <grid id="53693" layout-manager="GridLayoutManager" row-count="5" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="53693" binding="parametersPanel" layout-manager="GridLayoutManager" row-count="5" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="0" left="0" bottom="0" right="0"/>
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -396,7 +396,7 @@
                       <text value="chaarrHatred"/>
                     </properties>
                   </component>
-                  <component id="57968" class="javax.swing.JTextField" binding="textField1" default-binding="true">
+                  <component id="57968" class="javax.swing.JTextField" binding="chaarrHatredTextField">
                     <constraints>
                       <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -412,7 +412,7 @@
                       <text value="knowledge"/>
                     </properties>
                   </component>
-                  <component id="cce2d" class="javax.swing.JTextField" binding="textField2" default-binding="true">
+                  <component id="cce2d" class="javax.swing.JTextField" binding="knowledgeTextField">
                     <constraints>
                       <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -428,7 +428,7 @@
                       <text value="crewDeaths"/>
                     </properties>
                   </component>
-                  <component id="d6097" class="javax.swing.JTextField" binding="textField3" default-binding="true">
+                  <component id="d6097" class="javax.swing.JTextField" binding="crewDeathsTextField">
                     <constraints>
                       <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -444,7 +444,7 @@
                       <text value="survivorsDeaths"/>
                     </properties>
                   </component>
-                  <component id="474c0" class="javax.swing.JTextField" binding="textField4" default-binding="true">
+                  <component id="474c0" class="javax.swing.JTextField" binding="survivorsDeathsTextField">
                     <constraints>
                       <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -460,7 +460,7 @@
                       <text value="savedScience"/>
                     </properties>
                   </component>
-                  <component id="150b1" class="javax.swing.JTextField" binding="textField5" default-binding="true">
+                  <component id="150b1" class="javax.swing.JTextField" binding="savedScienceTextField">
                     <constraints>
                       <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -476,7 +476,7 @@
                       <text value="savedSurvivors"/>
                     </properties>
                   </component>
-                  <component id="1c6a3" class="javax.swing.JTextField" binding="textField6" default-binding="true">
+                  <component id="1c6a3" class="javax.swing.JTextField" binding="savedSurvivorsTextField">
                     <constraints>
                       <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -492,7 +492,7 @@
                       <text value="południcaEnergy"/>
                     </properties>
                   </component>
-                  <component id="29ac2" class="javax.swing.JTextField" binding="textField7" default-binding="true">
+                  <component id="29ac2" class="javax.swing.JTextField" binding="poludnicaEnergyTextField">
                     <constraints>
                       <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -508,7 +508,7 @@
                       <text value="południcaMatter"/>
                     </properties>
                   </component>
-                  <component id="c146a" class="javax.swing.JTextField" binding="textField8" default-binding="true">
+                  <component id="c146a" class="javax.swing.JTextField" binding="poludnicaMatterTextField">
                     <constraints>
                       <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -516,7 +516,7 @@
                     </constraints>
                     <properties/>
                   </component>
-                  <component id="aa0f6" class="javax.swing.JTextField" binding="textField9" default-binding="true">
+                  <component id="aa0f6" class="javax.swing.JTextField" binding="expeditionEnergyTextField">
                     <constraints>
                       <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -524,7 +524,7 @@
                     </constraints>
                     <properties/>
                   </component>
-                  <component id="71af2" class="javax.swing.JTextField" binding="textField10" default-binding="true">
+                  <component id="71af2" class="javax.swing.JTextField" binding="expeditionMatterTextField">
                     <constraints>
                       <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>

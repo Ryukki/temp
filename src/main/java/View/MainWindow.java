@@ -5,14 +5,16 @@ import Utils.Enums.*;
 import Utils.Logger;
 import Utils.StatusDisplayer;
 import okhttp3.Response;
-import org.json.*;
+import org.apache.commons.lang3.ArrayUtils;
+import org.json.JSONObject;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Ryukki on 23.03.2018.
@@ -20,8 +22,8 @@ import java.util.Arrays;
 public class MainWindow {
     private JTextArea logTextArea;
     private JButton restartButton;
-    private JLabel ParameterLabel;
-    private JLabel ValueLabel;
+    private JLabel parameterLabel;
+    private JLabel valueLabel;
     private JTextField valueTextField;
     private JButton sendButton;
     private JComboBox parameterComboBox;
@@ -42,16 +44,17 @@ public class MainWindow {
     private JScrollPane logAreaScrollPane;
     private JScrollPane eventsScrollPane;
     private JButton undoButton;
-    private JTextField textField1;
-    private JTextField textField2;
-    private JTextField textField3;
-    private JTextField textField4;
-    private JTextField textField5;
-    private JTextField textField6;
-    private JTextField textField7;
-    private JTextField textField8;
-    private JTextField textField9;
-    private JTextField textField10;
+    private JTextField chaarrHatredTextField;
+    private JTextField knowledgeTextField;
+    private JTextField crewDeathsTextField;
+    private JTextField survivorsDeathsTextField;
+    private JTextField savedScienceTextField;
+    private JTextField savedSurvivorsTextField;
+    private JTextField poludnicaEnergyTextField;
+    private JTextField poludnicaMatterTextField;
+    private JTextField expeditionEnergyTextField;
+    private JTextField expeditionMatterTextField;
+    private JPanel parametersPanel;
 
     private RequestSender requestSender;
     private StatusDisplayer statusDisplayer;
@@ -218,13 +221,56 @@ public class MainWindow {
                 commandLog="";
             }
 
-        }else {
+        } else if (parametersPanel.isVisible()) {
+            Map<Parameters, Integer> restartSimulationParameters = getRestartSimulationParameters();
+            if(!restartSimulationParameters.isEmpty()){
+                requestSuccessful  = requestSender.sendRequest((CommandTypes) commandComboBox.getSelectedItem(), restartSimulationParameters);
+                commandLog = "";//TODO
+            }else{
+                commandLog = "";
+            }
+        } else {
             requestSuccessful  = requestSender.sendRequest((CommandTypes) commandComboBox.getSelectedItem(), (Enum) parameterComboBox.getSelectedItem());
         }
         if(!requestSuccessful){
             JOptionPane.showMessageDialog(new JFrame(), "Sorry, something went wrong while sending your request.", "Sending Error", JOptionPane.ERROR_MESSAGE);
         }
         return commandLog;
+    }
+
+    private Map<Parameters, Integer> getRestartSimulationParameters() {
+        Map<Parameters, Integer> restartSimulationParameters = new HashMap<>();
+        try {
+            Component[] components = parametersPanel.getComponents();
+            for (Component component : components) {
+                if (component.getClass().equals(JLabel.class)) {
+                    components = ArrayUtils.removeElement(components, component);
+                } else {
+                    for (Parameters param : Parameters.values()) {
+                        String temp = component.getName();
+                        if (component.getName().equals(param.toString())) {
+                            JTextField paramTextField = (JTextField) component;
+                            String parameterText = paramTextField.getText();
+                            if (!parameterText.equals("") && !parameterText.equals("0")) {
+                                Integer parameterValue = Integer.parseInt(parameterText);
+                                if (parameterValue > 0) {
+                                    restartSimulationParameters.put(param, parameterValue);
+                                    components = ArrayUtils.removeElement(components, component);
+                                    break;
+                                } else {
+                                    JOptionPane.showMessageDialog(new JFrame(), "Parameter value should be greater than zero.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                                    return new HashMap<>();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(new JFrame(), "Parameter value has to be integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return new HashMap<>();
+        }
+        return restartSimulationParameters;
     }
 
     private void restartSimulation(){
@@ -242,6 +288,10 @@ public class MainWindow {
         CommandTypes commandType = (CommandTypes) commandComboBox.getSelectedItem();
         valueComboBox.setVisible(false);
         valueTextField.setVisible(false);
+        parameterComboBox.setVisible(true);
+        parametersPanel.setVisible(false);
+        valueLabel.setVisible(true);
+        parameterLabel.setVisible(true);
         switch (commandType){
             case Scan:
             case MoveTo:
@@ -263,7 +313,10 @@ public class MainWindow {
                 valueTextField.setEditable(false);
                 break;
             case RestartSimulation:
-                //TODO Można ustawiać kilka parametrow jednoczesnie...
+                parametersPanel.setVisible(true);
+                parameterComboBox.setVisible(false);
+                valueLabel.setVisible(false);
+                parameterLabel.setVisible(false);
                 break;
             default:
                 break;
@@ -295,7 +348,18 @@ public class MainWindow {
         logBookTextArea.setLineWrap(true);
         scoresTextArea.setEditable(false);
         parametersTextArea.setEditable(false);
+        parametersPanel.setVisible(false);
         setupCommandComboBox();
+        chaarrHatredTextField.setName("chaarrHatred");
+        knowledgeTextField.setName("knowledge");
+        crewDeathsTextField.setName("crewDeaths");
+        survivorsDeathsTextField.setName("survivorsDeaths");
+        savedScienceTextField.setName("savedScience");
+        savedSurvivorsTextField.setName("savedSurvivors");
+        poludnicaMatterTextField.setName("poludnicaMatter");
+        poludnicaEnergyTextField.setName("poludnicaEnergy");
+        expeditionMatterTextField.setName("expeditionMatter");
+        expeditionEnergyTextField.setName("expeditionEnergy");
     }
 
     private void setupCommandComboBox(){

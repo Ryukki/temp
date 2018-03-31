@@ -2,6 +2,7 @@ package Communication;
 
 import Utils.Enums.CommandTypes;
 import Utils.Enums.Locations;
+import Utils.Enums.Parameters;
 import com.sun.org.apache.regexp.internal.RE;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -9,6 +10,7 @@ import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class RequestSender {
     private OkHttpClient client;
@@ -84,4 +86,9 @@ public class RequestSender {
         return sendingSuccesfull;
     }
 
+    public boolean sendRequest(CommandTypes commandType, Map<Parameters, Integer> restartSimulationParameters){
+        Request request = requestFactory.getRequest(commandType, restartSimulationParameters);
+        Boolean sendingSuccesfull = send(request);
+        return sendingSuccesfull;
+    }
 }

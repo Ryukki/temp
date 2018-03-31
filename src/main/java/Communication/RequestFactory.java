@@ -3,6 +3,7 @@ package Communication;
 import Utils.CommandsLogger;
 import Utils.Enums.CommandTypes;
 import Utils.Enums.Locations;
+import Utils.Enums.Parameters;
 import Utils.Logger;
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -10,6 +11,7 @@ import okhttp3.RequestBody;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Ryukki on 22.03.2018.
@@ -75,6 +77,22 @@ public class RequestFactory{
     }
 
     public Request getRequest(String command){
+        return buildRequest(command);
+    }
+
+    public Request getRequest(CommandTypes action, Map<Parameters, Integer> restartSimulationParameters){
+        String parameters = "";
+        for(Map.Entry<Parameters, Integer> resetParameter: restartSimulationParameters.entrySet()){
+            parameters += "'" + resetParameter.getKey().toString() + "': " + resetParameter.getValue() + ",";
+        }
+
+        String command = "{'Command':'" + action + "',"
+                + "'Login':'" + login + "',"
+                + "'Token':'" + token + "',"
+                + "'Parameter':{"
+                + parameters
+                + "}}";
+
         return buildRequest(command);
     }
 
