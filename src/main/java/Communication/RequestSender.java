@@ -2,19 +2,18 @@ package Communication;
 
 import Utils.Enums.CommandTypes;
 import Utils.Enums.Locations;
-import Utils.Enums.Parameters;
-import com.sun.org.apache.regexp.internal.RE;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class RequestSender {
     private OkHttpClient client;
-    RequestFactory requestFactory;
+    private RequestFactory requestFactory;
 
     public RequestSender(boolean environment){
         client = new OkHttpClient();
@@ -25,12 +24,17 @@ public class RequestSender {
         requestFactory = new RequestFactory(environment);
     }
 
-    public void undoCommand(){
+    public List<Response> undoCommand(){
         List<String> commandsList = requestFactory.getCommands();
+        List<Response> allResponses = new ArrayList<>();
+        Response response;
         for(int i = 0; i<commandsList.size()-1; i++){
             Request request = requestFactory.getRequest(commandsList.get(i));
             send(request);
+            response = getStatus();
+            allResponses.add(response);
         }
+        return allResponses;
     }
 
     public Response getStatus(){
@@ -54,6 +58,7 @@ public class RequestSender {
         try {
             Response response = client.newCall(request).execute();
             if (response.isSuccessful()){
+                response.close();
                 return true;
             }
         } catch (IOException e) {
@@ -86,7 +91,7 @@ public class RequestSender {
         return sendingSuccesfull;
     }
 
-    public boolean sendRequest(CommandTypes commandType, Map<Parameters, Integer> restartSimulationParameters){
+    public boolean sendRequest(CommandTypes commandType, Map<String, Integer> restartSimulationParameters){
         Request request = requestFactory.getRequest(commandType, restartSimulationParameters);
         Boolean sendingSuccesfull = send(request);
         return sendingSuccesfull;

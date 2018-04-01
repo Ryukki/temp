@@ -3,8 +3,6 @@ package Communication;
 import Utils.CommandsLogger;
 import Utils.Enums.CommandTypes;
 import Utils.Enums.Locations;
-import Utils.Enums.Parameters;
-import Utils.Logger;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -80,10 +78,10 @@ public class RequestFactory{
         return buildRequest(command);
     }
 
-    public Request getRequest(CommandTypes action, Map<Parameters, Integer> restartSimulationParameters){
+    public Request getRequest(CommandTypes action, Map<String, Integer> restartSimulationParameters){
         String parameters = "";
-        for(Map.Entry<Parameters, Integer> resetParameter: restartSimulationParameters.entrySet()){
-            parameters += "'" + resetParameter.getKey().toString() + "': " + resetParameter.getValue() + ",";
+        for(Map.Entry<String, Integer> resetParameter: restartSimulationParameters.entrySet()){
+            parameters += "'" + resetParameter.getKey() + "': " + resetParameter.getValue() + ",";
         }
 
         String command = "{'Command':'" + action + "',"

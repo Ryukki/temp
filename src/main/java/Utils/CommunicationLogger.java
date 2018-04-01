@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 /**
  * Created by Ryukki on 29.03.2018.
  */
-public class Logger {
+public class CommunicationLogger {
     private static String temporaryLogFilePath = "resources/Logs/LogFile-";
     private File temporaryLogFile;
 
-    public Logger(){
+    public CommunicationLogger(){
         newLogFile();
     }
 

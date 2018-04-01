@@ -1,8 +1,8 @@
 package View;
 
 import Communication.RequestSender;
+import Utils.CommunicationLogger;
 import Utils.Enums.*;
-import Utils.Logger;
 import Utils.StatusDisplayer;
 import okhttp3.Response;
 import org.apache.commons.lang3.ArrayUtils;
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,7 +29,6 @@ public class MainWindow {
     private JButton sendButton;
     private JComboBox parameterComboBox;
     private JComboBox commandComboBox;
-    private JLabel CommandLabel;
     private JRadioButton chaarrOrSimulationRadioButton;
     private JTextField turnTextField;
     private JTextField locationTextField;
@@ -58,17 +58,14 @@ public class MainWindow {
 
     private RequestSender requestSender;
     private StatusDisplayer statusDisplayer;
-    private Logger logger;
+    private CommunicationLogger logger;
 
     private static String paragraph = "====================";
-    private JSONObject currentTurnObject = null;
-    private JSONObject previousTurnObject = null;
     private Boolean isTerminated=false;
 
-    //nie zapomnieć logować jaka komenda z jakimi parametrami
     public MainWindow() {
         statusDisplayer = new StatusDisplayer();
-        logger = new Logger();
+        logger = new CommunicationLogger();
         setupListeners();
         setupTextFields();
         manageInputFields();
@@ -94,47 +91,42 @@ public class MainWindow {
     }
 
     private void displayResponse(Response response){
-        if(currentTurnObject != null){
-            previousTurnObject = currentTurnObject;
-            currentTurnObject = getJsonFromResponse(response);
-        }else {
-            previousTurnObject = currentTurnObject = getJsonFromResponse(response);
-        }
-        if(currentTurnObject!=null && previousTurnObject!= null){
-            statusDisplayer.setCurrentTurnObject(currentTurnObject);
-            statusDisplayer.setPreviousTurnObject(previousTurnObject);
+        JSONObject currentTurnObject = getJsonFromResponse(response);
+        statusDisplayer.setCurrentTurnObject(currentTurnObject);
 
-            try {
-                logger.log(statusDisplayer.getResponseForLogging());
-            } catch (IOException e) {
-                //TODO add information to user?
-                e.printStackTrace();
-            }
-
-            logTextArea.append(paragraph);
-            String temp = statusDisplayer.getEntireResponse();
-            temp = statusDisplayer.getResponseForLogging();
-            logTextArea.append(statusDisplayer.getEntireResponse());
-            turnTextField.setText(statusDisplayer.getTurn());
-            locationTextField.setText(statusDisplayer.getLocation());
-            eventsTextArea.setText(statusDisplayer.getEvents());
-            lastTurnEventsTextArea.setText(statusDisplayer.getLastTurnEvents());
-            equipmentsTextArea.setText(statusDisplayer.getEquipments());
-            logBookTextArea.setText(statusDisplayer.getLogBook());
-            scoresTextArea.setText(statusDisplayer.getScores());
-            parametersTextArea.setText(statusDisplayer.getParameters());
-            moveScrollBars();
-            checkAndHandleEndOfSimulation(statusDisplayer);
+        try {
+            logger.log(statusDisplayer.getResponseForLogging());
+        } catch (IOException e) {
+            //TODO add information to user?
+            e.printStackTrace();
         }
+
+        logTextArea.append(paragraph);
+        logTextArea.append(statusDisplayer.getResponseForLogging());
+        turnTextField.setText(statusDisplayer.getTurn());
+        locationTextField.setText(statusDisplayer.getLocation());
+        eventsTextArea.setText(statusDisplayer.getEvents());
+        lastTurnEventsTextArea.setText(statusDisplayer.getLastTurnEvents());
+        equipmentsTextArea.setText(statusDisplayer.getEquipments());
+        logBookTextArea.setText(statusDisplayer.getLogBook());
+        scoresTextArea.setText(statusDisplayer.getScores());
+        parametersTextArea.setText(statusDisplayer.getParameters());
+        moveScrollBars();
+        checkAndHandleEndOfSimulation(statusDisplayer);
     }
 
     private JSONObject getJsonFromResponse(Response response){
         String jsonData = null;
         try {
+            Boolean temp = response.isSuccessful();
             jsonData = response.body().string();
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
+        } finally {
+            response.close();
         }
+        //TODO rethink null
+
         return new JSONObject(jsonData);
     }
 
@@ -161,7 +153,7 @@ public class MainWindow {
                     choices,
                     defaultChoice);
             if(selectedOption==JOptionPane.YES_OPTION){
-                restartSimulation();
+                restart();
             }
         }else {
             isTerminated=false;
@@ -170,7 +162,7 @@ public class MainWindow {
 
     private void setupListeners(){
         sendButton.addActionListener(e -> {
-            if(isTerminated==false){
+            if (!isTerminated) {
                 String commandLog = sendRequest();
                 if (!commandLog.equals("")){
                     logTextArea.append(commandLog);
@@ -180,7 +172,6 @@ public class MainWindow {
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
-
                 }
             }else {
                 JOptionPane.showMessageDialog(new JFrame(), "Sorry but you failed miserably, please use restart button.", "Mission failed!", JOptionPane.ERROR_MESSAGE);
@@ -188,11 +179,18 @@ public class MainWindow {
         });
 
         undoButton.addActionListener(e -> {
-            requestSender.undoCommand();
-            showStatus();
+            List<Response> previousTurns = requestSender.undoCommand();
+            if(!previousTurns.isEmpty()){
+                statusDisplayer.resetDisplayer();
+                logger.newLogFile();
+                logTextArea.setText("");
+            }
+            for(Response response: previousTurns){//TODO display commands as well
+                displayResponse(response);
+            }
         });
 
-        restartButton.addActionListener(e -> restartSimulation());
+        restartButton.addActionListener(e -> restart());
 
         commandComboBox.addActionListener(e -> manageInputFields());
 
@@ -222,10 +220,10 @@ public class MainWindow {
             }
 
         } else if (parametersPanel.isVisible()) {
-            Map<Parameters, Integer> restartSimulationParameters = getRestartSimulationParameters();
+            Map<String, Integer> restartSimulationParameters = getRestartSimulationParameters();
             if(!restartSimulationParameters.isEmpty()){
                 requestSuccessful  = requestSender.sendRequest((CommandTypes) commandComboBox.getSelectedItem(), restartSimulationParameters);
-                commandLog = "";//TODO
+                commandLog = commandComboBox.getSelectedItem().toString().toUpperCase();//TODO
             }else{
                 commandLog = "";
             }
@@ -238,30 +236,23 @@ public class MainWindow {
         return commandLog;
     }
 
-    private Map<Parameters, Integer> getRestartSimulationParameters() {
-        Map<Parameters, Integer> restartSimulationParameters = new HashMap<>();
+    private Map<String, Integer> getRestartSimulationParameters() {
+        Map<String, Integer> restartSimulationParameters = new HashMap<>();
         try {
             Component[] components = parametersPanel.getComponents();
             for (Component component : components) {
-                if (component.getClass().equals(JLabel.class)) {
-                    components = ArrayUtils.removeElement(components, component);
-                } else {
-                    for (Parameters param : Parameters.values()) {
-                        String temp = component.getName();
-                        if (component.getName().equals(param.toString())) {
-                            JTextField paramTextField = (JTextField) component;
-                            String parameterText = paramTextField.getText();
-                            if (!parameterText.equals("") && !parameterText.equals("0")) {
-                                Integer parameterValue = Integer.parseInt(parameterText);
-                                if (parameterValue > 0) {
-                                    restartSimulationParameters.put(param, parameterValue);
-                                    components = ArrayUtils.removeElement(components, component);
-                                    break;
-                                } else {
-                                    JOptionPane.showMessageDialog(new JFrame(), "Parameter value should be greater than zero.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                                    return new HashMap<>();
-                                }
-                            }
+                if (component.getClass().equals(JTextField.class)) {
+                    JTextField paramTextField = (JTextField) component;
+                    String parameterText = paramTextField.getText();
+                    if (!parameterText.equals("") && !parameterText.equals("0")) {
+                        Integer parameterValue = Integer.parseInt(parameterText);
+                        String parameterName = paramTextField.getName();
+                        if (parameterValue > 0) {
+                            restartSimulationParameters.put(parameterName, parameterValue);
+                            components = ArrayUtils.removeElement(components, component);
+                        } else {
+                            JOptionPane.showMessageDialog(new JFrame(), "Parameter value should be greater than zero.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                            return new HashMap<>();
                         }
                     }
                 }
@@ -273,14 +264,13 @@ public class MainWindow {
         return restartSimulationParameters;
     }
 
-    private void restartSimulation(){
+    private void restart() {
         logger.newLogFile();
         requestSender.sendRequest(CommandTypes.Restart);
         requestSender.setEnvironment(chaarrOrSimulationRadioButton.isSelected());
         setupCommandComboBox();
         logTextArea.setText("");
-        currentTurnObject = null;
-        previousTurnObject = null;
+        statusDisplayer.resetDisplayer();
         showStatus();
     }
 
@@ -356,15 +346,15 @@ public class MainWindow {
         survivorsDeathsTextField.setName("survivorsDeaths");
         savedScienceTextField.setName("savedScience");
         savedSurvivorsTextField.setName("savedSurvivors");
-        poludnicaMatterTextField.setName("poludnicaMatter");
-        poludnicaEnergyTextField.setName("poludnicaEnergy");
+        poludnicaMatterTextField.setName("południcaMatter");
+        poludnicaEnergyTextField.setName("południcaEnergy");
         expeditionMatterTextField.setName("expeditionMatter");
         expeditionEnergyTextField.setName("expeditionEnergy");
     }
 
     private void setupCommandComboBox(){
         CommandTypes[] commandTypes = CommandTypes.values();
-        ArrayList tempCommandTypesList = new ArrayList<CommandTypes>(Arrays.asList(commandTypes));
+        ArrayList tempCommandTypesList = new ArrayList<>(Arrays.asList(commandTypes));
         tempCommandTypesList.remove(CommandTypes.Restart);
         if(chaarrOrSimulationRadioButton.isSelected()){
             tempCommandTypesList.remove(CommandTypes.RestartSimulation);

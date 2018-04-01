@@ -30,7 +30,6 @@ public class CommandsLogger {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        newCommandsLog();
         return previousCommands;
     }
 

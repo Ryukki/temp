@@ -137,7 +137,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="bf4a9" class="javax.swing.JTextField" binding="turnTextField">
+              <component id="a028a" class="javax.swing.JTextField" binding="locationTextField">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -155,7 +155,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="a028a" class="javax.swing.JTextField" binding="locationTextField">
+              <component id="bf4a9" class="javax.swing.JTextField" binding="turnTextField">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -244,7 +244,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="6c2dc" class="javax.swing.JLabel" binding="CommandLabel">
+              <component id="6c2dc" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
                     <preferred-size width="78" height="16"/>

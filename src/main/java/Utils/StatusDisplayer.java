@@ -14,11 +14,18 @@ public class StatusDisplayer {
     private JsonFormatter previousTurnObject;
 
     public void setCurrentTurnObject(JSONObject currentTurnObject) {
-        this.currentTurnObject = new JsonFormatter(currentTurnObject);
+        JsonFormatter jsonFormatter = new JsonFormatter(currentTurnObject);
+        if (this.currentTurnObject != null) {
+            this.previousTurnObject = this.currentTurnObject;
+            this.currentTurnObject = jsonFormatter;
+        } else {
+            this.previousTurnObject = this.currentTurnObject = jsonFormatter;
+        }
     }
 
-    public void setPreviousTurnObject(JSONObject previousTurnObject) {
-        this.previousTurnObject =  new JsonFormatter(previousTurnObject);
+    public void resetDisplayer(){
+        currentTurnObject = null;
+        previousTurnObject = null;
     }
 
     public String getTurn(){
