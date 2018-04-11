@@ -26,6 +26,7 @@ public class RequestSender {
 
     public List<Response> undoCommand(){
         List<String> commandsList = requestFactory.getCommands();
+        sendRequest(CommandTypes.Restart);
         List<Response> allResponses = new ArrayList<>();
         Response response;
         for(int i = 0; i<commandsList.size()-1; i++){

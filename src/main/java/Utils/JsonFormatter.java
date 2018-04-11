@@ -88,9 +88,6 @@ public class JsonFormatter {
 
     public Boolean checkTerminated(){
         String isTerminated = getSingleValue("isTerminated");
-        if (isTerminated.equals("false")){
-            return false;
-        }
-        return true;
+        return !isTerminated.equals("false");
     }
 }

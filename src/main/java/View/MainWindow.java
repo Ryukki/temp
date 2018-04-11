@@ -11,11 +11,8 @@ import org.json.JSONObject;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Ryukki on 23.03.2018.
@@ -62,10 +59,13 @@ public class MainWindow {
 
     private static String paragraph = "====================";
     private Boolean isTerminated=false;
+    private List<String> usedCommands;
+    private int currentTurn = 0;
 
     public MainWindow() {
         statusDisplayer = new StatusDisplayer();
         logger = new CommunicationLogger();
+        usedCommands = new ArrayList<>();
         setupListeners();
         setupTextFields();
         manageInputFields();
@@ -166,26 +166,38 @@ public class MainWindow {
                 String commandLog = sendRequest();
                 if (!commandLog.equals("")){
                     logTextArea.append(commandLog);
-                    showStatus();
                     try {
                         logger.log(paragraph + commandLog + paragraph);
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
+                    collectCommand(commandLog);
+                    showStatus();
                 }
             }else {
                 JOptionPane.showMessageDialog(new JFrame(), "Sorry but you failed miserably, please use restart button.", "Mission failed!", JOptionPane.ERROR_MESSAGE);
             }
         });
-
         undoButton.addActionListener(e -> {
             List<Response> previousTurns = requestSender.undoCommand();
+            currentTurn=0;
             if(!previousTurns.isEmpty()){
                 statusDisplayer.resetDisplayer();
                 logger.newLogFile();
                 logTextArea.setText("");
             }
-            for(Response response: previousTurns){//TODO display commands as well
+            for(Response response: previousTurns){
+                String command = "";
+                if(!usedCommands.isEmpty()&& usedCommands.size()>= currentTurn){
+                    command = usedCommands.get(currentTurn);
+                }
+                logTextArea.append(paragraph + command);
+                try {
+                    logger.log(paragraph + command + paragraph);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                currentTurn++;
                 displayResponse(response);
             }
         });
@@ -223,6 +235,8 @@ public class MainWindow {
             Map<String, Integer> restartSimulationParameters = getRestartSimulationParameters();
             if(!restartSimulationParameters.isEmpty()){
                 requestSuccessful  = requestSender.sendRequest((CommandTypes) commandComboBox.getSelectedItem(), restartSimulationParameters);
+                logTextArea.setText("");
+                logBookTextArea.setText("");
                 commandLog = commandComboBox.getSelectedItem().toString().toUpperCase();//TODO
             }else{
                 commandLog = "";
@@ -234,6 +248,15 @@ public class MainWindow {
             JOptionPane.showMessageDialog(new JFrame(), "Sorry, something went wrong while sending your request.", "Sending Error", JOptionPane.ERROR_MESSAGE);
         }
         return commandLog;
+    }
+
+    private void collectCommand(String command){
+        if(usedCommands.size()<=currentTurn){
+            usedCommands.add(command);
+        }else{
+            usedCommands.set(currentTurn, command);
+        }
+        currentTurn++;
     }
 
     private Map<String, Integer> getRestartSimulationParameters() {
@@ -272,6 +295,8 @@ public class MainWindow {
         logTextArea.setText("");
         statusDisplayer.resetDisplayer();
         showStatus();
+        currentTurn=0;
+        collectCommand(CommandTypes.Restart.toString().toUpperCase());
     }
 
     private void manageInputFields(){
